@@ -115,9 +115,9 @@ public class Ejercicio {
             boolean b = false; //una vez tenemos la distancia mínima de la parte izquierda y la derecha, se comprueba si alguna distancia en la frontera es menor
             int i = 0;
             double xminima = puntos[mitad].getX() - dminima;
-            if(xminima < 0){xminima = 0;}
+            if(xminima < 0){xminima = 0;} //solo en caso de que las coordenadas no puedan ser negativas
             double xmaxima = puntos[mitad].getX() + dminima;
-            while(b == false && i < puntos.length){
+            while(b == false && i < puntos.length){ //encuentra el primer punto que entra en la frontera por la izquierda
                 if(puntos[i].getX() >= xminima){
                     b = true;
                 } else{i++;}
