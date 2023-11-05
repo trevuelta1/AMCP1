@@ -4,6 +4,7 @@ package AMCP1;
  *
  * @author USUARIO1
  */
+
 public class Ejercicio {
     private int particion(Punto vector[], int izquierda, int derecha) {
         double pivote = vector[izquierda].getX();
@@ -143,6 +144,41 @@ public class Ejercicio {
             solucion[0] = puntos[0];
             solucion[1] = puntos[0];
         }
+        return solucion;
+    }
+    public Ciudad ciudadMasCercanaSinVisitar(Ciudad inicio, Ciudad[] ciudades) throws Exception{
+        double dmin = Double.MAX_VALUE;
+        int indice = -1;
+        for(int i = 0; i < ciudades.length; i++){
+            if(ciudades[i].getCoordenadas().getId() != inicio.getCoordenadas().getId()){
+                if(ciudades[i].getVisitado() == false){
+                    double distancia = Punto.distancia(ciudades[i].getCoordenadas(), inicio.getCoordenadas());
+                    if(distancia < dmin){
+                        dmin = distancia;
+                        indice = i;
+                    }
+                }
+            }
+        }
+        if(indice != -1){
+            ciudades[indice].setVisitado(true);
+            return ciudades[indice];
+        } else{
+            throw new Exception("Todas las ciudades han sido visitadas.");
+        }
+    }
+    public SolucionCiudades vorazCiudades(Ciudad[] ciudades, Ciudad inicio) throws Exception{
+        SolucionCiudades solucion = new SolucionCiudades(ciudades);
+        solucion.addCiudad(inicio);
+        for(int i = 0; i < ciudades.length - 1; i++){
+            Ciudad c = ciudadMasCercanaSinVisitar(inicio, ciudades);
+            solucion.addCiudad(c);
+            solucion.addDistancia(Punto.distancia(inicio.getCoordenadas(), c.getCoordenadas()));
+            inicio = c;
+        }
+        solucion.addCiudad(solucion.getCiudades()[0]);
+        solucion.addDistancia(Punto.distancia(solucion.getCiudades()[0].getCoordenadas(), inicio.getCoordenadas()));
+        solucion.actualizarDistanciaTotal();
         return solucion;
     }
     public static void main(String[] args) {
