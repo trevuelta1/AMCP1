@@ -22,7 +22,7 @@ public class Punto {
     public void setY(double y){this.y = y;}
     public int getId(){return this.id;}
     public void setId(int id){this.id = id;}
-    public String getPunto(){return "X = " + this.x + ". Y = " + this.y + ".";}
+    public String getPunto(){return "Punto " + this.id + ". X = " + this.x + ". Y = " + this.y + ".";}
     public static double distancia(Punto p1, Punto p2){
         double distancia = Math.sqrt(Math.pow((p1.getX() - p2.getX()), 2) + Math.pow((p1.getY() - p2.getY()), 2));
         return distancia;        
