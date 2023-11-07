@@ -209,6 +209,9 @@ public class Ejercicio {
         solucion.addCiudad(solucion.getCiudades()[0]);
         solucion.addDistancia(Punto.distancia(solucion.getCiudades()[0].getCoordenadas(), inicio.getCoordenadas()));
         solucion.actualizarDistanciaTotal();
+        for(int i = 0; i < ciudades.length; i++){
+            ciudades[i].setVisitado(false);
+        }
         return solucion;
     }
     
@@ -289,7 +292,7 @@ public class Ejercicio {
                 Random x = new Random();
                 x.setSeed(System.currentTimeMillis());
                 Random y = new Random();
-                y.setSeed(System.currentTimeMillis());
+                y.setSeed(System.currentTimeMillis() + 1);
                 int talla;
                 Scanner sc = new Scanner(System.in);
                 do{
@@ -298,7 +301,7 @@ public class Ejercicio {
                 } while(talla < 2);
                 puntos = new Punto[talla];
                 for(int i = 0; i < talla; i++){
-                    puntos[i] = new Punto(x.nextDouble(), y.nextDouble());
+                    puntos[i] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                 }
                 int opt;
                 do{
@@ -440,7 +443,7 @@ public class Ejercicio {
                 Random x = new Random();
                 x.setSeed(System.currentTimeMillis());
                 Random y = new Random();
-                y.setSeed(System.currentTimeMillis());
+                y.setSeed(System.currentTimeMillis() + 1);
                 int talla;
                 Scanner sc = new Scanner(System.in);
                 do{
@@ -450,7 +453,7 @@ public class Ejercicio {
                 puntos = new Punto[talla];
                 ciudades = new Ciudad[talla];
                 for(int i = 0; i < talla; i++){
-                    puntos[i] = new Punto(x.nextDouble(), y.nextDouble());
+                    puntos[i] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                     ciudades[i] = new Ciudad(puntos[i]);
                 }
                 int opt;
@@ -466,6 +469,7 @@ public class Ejercicio {
                 switch(opt){
                     case 1:{
                         try {
+                            ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
                             solucion.getSolucion();
                             break;
@@ -476,6 +480,7 @@ public class Ejercicio {
 
                     case 2:{
                         try {
+                            ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
                             solucion.getSolucion();
                             break;
@@ -509,6 +514,7 @@ public class Ejercicio {
                 switch(opt){
                     case 1:{
                         try {
+                            ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
                             solucion.getSolucion();
                             break;
@@ -519,6 +525,7 @@ public class Ejercicio {
 
                     case 2:{
                         try {
+                            ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
                             solucion.getSolucion();
                             break;
@@ -539,7 +546,177 @@ public class Ejercicio {
     }
     
     
+    public void compararEstrategiasPuntos(){
+        int size = 500;
+        Punto[] puntos;
+        Random x = new Random();
+        x.setSeed(System.currentTimeMillis());
+        Random y = new Random();
+        y.setSeed(System.currentTimeMillis() + 1);
+        long totalexh = 0, totalpod = 0, totaldyv = 0, totaldyvmej = 0;
+        System.out.println("\tTalla\tExhaustivo\tExhaustivoPoda\tDivideYVenceras\tDyVMejora");
+        System.out.println("");
+        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("");
+        for(int a = 0; a < 10; a++){
+            for(int i = 0; i < 10; i++){
+                puntos = new Punto[size];
+                for(int j = 0; j < size; j++){
+                    puntos[j] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
+                }
+                long texh = System.currentTimeMillis();
+                busquedaExhaustiva(puntos);
+                texh = System.currentTimeMillis() - texh;
+                totalexh = totalexh + texh;
+                long tpod = System.currentTimeMillis();
+                busquedaPoda(puntos);
+                tpod = System.currentTimeMillis() - tpod;
+                totalpod = totalpod + tpod;
+                long tdyv = System.currentTimeMillis();
+                divideYvenceras(puntos);
+                tdyv = System.currentTimeMillis() - tdyv;
+                totaldyv = totaldyv + tdyv;
+                long tdyvmej = System.currentTimeMillis();
+                divideYvencerasMejora(puntos);
+                tdyvmej = System.currentTimeMillis() - tdyvmej;
+                totaldyvmej = totaldyvmej + tdyvmej;
+            }
+            System.out.println("\t" + size + "\t" + totalexh / 10 + "\t" + totalpod / 10 + "\t" + totaldyv / 10 + "\t" + totaldyvmej / 10);
+            size = size + 500;
+            totalexh = 0; totalpod = 0; totaldyv = 0; totaldyvmej = 0;
+        }
+    }
+    
+    
+    public void compararEstrategiasMismaVertical(){
+        int size = 500;
+        Punto[] puntos;
+        Random y = new Random();
+        y.setSeed(System.currentTimeMillis());
+        long totalexh = 0, totalpod = 0, totaldyv = 0, totaldyvmej = 0;
+        System.out.println("\tTalla\tExhaustivo\tExhaustivoPoda\tDivideYVenceras\tDyVMejora");
+        System.out.println("");
+        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("");
+        for(int a = 0; a < 10; a++){
+            for(int i = 0; i < 10; i++){
+                puntos = new Punto[size];
+                for(int j = 0; j < size; j++){
+                    puntos[j] = new Punto(50, y.nextDouble() * 1000);
+                }
+                long texh = System.currentTimeMillis();
+                busquedaExhaustiva(puntos);
+                texh = System.currentTimeMillis() - texh;
+                totalexh = totalexh + texh;
+                long tpod = System.currentTimeMillis();
+                busquedaPoda(puntos);
+                tpod = System.currentTimeMillis() - tpod;
+                totalpod = totalpod + tpod;
+                long tdyv = System.currentTimeMillis();
+                divideYvenceras(puntos);
+                tdyv = System.currentTimeMillis() - tdyv;
+                totaldyv = totaldyv + tdyv;
+                long tdyvmej = System.currentTimeMillis();
+                divideYvencerasMejora(puntos);
+                tdyvmej = System.currentTimeMillis() - tdyvmej;
+                totaldyvmej = totaldyvmej + tdyvmej;
+            }
+            System.out.println("\t" + size + "\t" + totalexh / 10 + "\t" + totalpod / 10 + "\t" + totaldyv / 10 + "\t" + totaldyvmej / 10);
+            size = size + 500;
+            totalexh = 0; totalpod = 0; totaldyv = 0; totaldyvmej = 0;
+        }
+    }
+    
+    
+    
+    public void compararEstrategiasCiudades(){
+        int size = 500;
+        Punto[] puntos;
+        Ciudad[] ciudades;
+        Random x = new Random();
+        x.setSeed(System.currentTimeMillis());
+        Random y = new Random();
+        y.setSeed(System.currentTimeMillis() + 1);
+        long totaluni = 0, totalbi = 0;
+        System.out.println("\tTalla\tVorazUnidireccional\tVorazBidireccional");
+        System.out.println("");
+        System.out.println("------------------------------------------------------------------");
+        System.out.println("");
+        for(int a = 0; a < 10; a++){
+            for(int i = 0; i < 100; i++){
+                try {
+                    puntos = new Punto[size];
+                    ciudades = new Ciudad[size];
+                    for(int j = 0; j < size; j++){
+                        puntos[j] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
+                        ciudades[j] = new Ciudad(puntos[j]);
+                    }
+                    ciudades[0].setVisitado(true);
+                    long tuni = System.currentTimeMillis();
+                    vorazCiudades(ciudades, ciudades[0]);
+                    tuni = System.currentTimeMillis() - tuni;
+                    totaluni = totaluni + tuni;
+                    ciudades[0].setVisitado(true);
+                    long tbi = System.currentTimeMillis();
+                    vorazDoble(ciudades, ciudades[0]);
+                    tbi = System.currentTimeMillis() - tbi;
+                    totalbi = totalbi + tbi;
+                } catch (Exception ex) {
+                    Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            System.out.println("\t" + size + "\t" + totaluni / 100 + "\t" + totalbi / 100);
+            size = size + 500;
+            totaluni = 0; totalbi = 0;
+        }
+    }
+    
+    
     public static void main(String[] args) {
-        
+        Ejercicio ej = new Ejercicio();
+        int menuprincipal = ej.menuPrincipal();
+        switch(menuprincipal){
+            case 1:{
+                int menupuntos = ej.menuPuntos();
+                switch(menupuntos){
+                    case 1:{
+                        ej.probarEstrategiaPuntos();
+                        break;
+                    }
+                    case 2:{
+                        ej.compararEstrategiasPuntos();
+                        break;
+                    }
+                    case 3:{
+                        ej.compararEstrategiasMismaVertical();
+                        break;
+                    }
+                    default:{
+                        break;
+                    }
+                }
+                break;
+            }
+            case 2:{
+                int menuciudades = ej.menuCiudades();
+                switch(menuciudades){
+                    case 1:{
+                        ej.probarEstrategiaCiudades();
+                        break;
+                    }
+                    case 2:{
+                        ej.compararEstrategiasCiudades();
+                        break;
+                    }
+                    default:{
+                        break;
+                    }
+                }
+                break;
+            }
+            default:{
+                break;
+            }
+        }
     }
 }

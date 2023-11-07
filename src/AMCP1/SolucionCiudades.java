@@ -46,10 +46,11 @@ public class SolucionCiudades {
     public void getSolucion(){
         System.out.println("SOLUTION: " + this.distanciaTotal);
         System.out.println("TOUR_SECTION");
-        System.out.println(this.ciudades[0].getCoordenadas().getId());
+        System.out.print(this.ciudades[0].getCoordenadas().getId());
         for(int i = 1; i < this.ciudades.length; i++){
             System.out.print(", " + this.ciudades[i].getCoordenadas().getId());
         }
+        System.out.println("");
         for(int i = 0; i < this.distancias.length; i++){
             System.out.println(this.distancias[i] + " - " + this.ciudades[i].getCoordenadas().getId() + "," + this.ciudades[i + 1].getCoordenadas().getId());
         }
