@@ -54,9 +54,9 @@ public class Ejercicio {
             throw new Exception("Formato de fichero incorrecto.");
         }
         if(puntos.size() >= 2){
-            return (Punto[]) puntos.toArray();
+            return puntos.toArray(new Punto[puntos.size()]);
         } else{
-            throw new Exception("Formato de fichero incorrecto."); 
+            throw new Exception("El fichero no tiene puntos suficientes."); 
         }
     }
     
@@ -728,49 +728,52 @@ public class Ejercicio {
     
     public static void main(String[] args) {
         Ejercicio ej = new Ejercicio();
-        int menuprincipal = ej.menuPrincipal();
-        switch(menuprincipal){
-            case 1:{
-                int menupuntos = ej.menuPuntos();
-                switch(menupuntos){
-                    case 1:{
-                        ej.probarEstrategiaPuntos();
-                        break;
+        int menuprincipal;
+        do{
+            menuprincipal = ej.menuPrincipal();
+            switch(menuprincipal){
+                case 1:{
+                    int menupuntos = ej.menuPuntos();
+                    switch(menupuntos){
+                        case 1:{
+                            ej.probarEstrategiaPuntos();
+                            break;
+                        }
+                        case 2:{
+                            ej.compararEstrategiasPuntos();
+                            break;
+                        }
+                        case 3:{
+                            ej.compararEstrategiasMismaVertical();
+                            break;
+                        }
+                        default:{
+                            break;
+                        }
                     }
-                    case 2:{
-                        ej.compararEstrategiasPuntos();
-                        break;
-                    }
-                    case 3:{
-                        ej.compararEstrategiasMismaVertical();
-                        break;
-                    }
-                    default:{
-                        break;
-                    }
+                    break;
                 }
-                break;
-            }
-            case 2:{
-                int menuciudades = ej.menuCiudades();
-                switch(menuciudades){
-                    case 1:{
-                        ej.probarEstrategiaCiudades();
-                        break;
+                case 2:{
+                    int menuciudades = ej.menuCiudades();
+                    switch(menuciudades){
+                        case 1:{
+                            ej.probarEstrategiaCiudades();
+                            break;
+                        }
+                        case 2:{
+                            ej.compararEstrategiasCiudades();
+                            break;
+                        }
+                        default:{
+                            break;
+                        }
                     }
-                    case 2:{
-                        ej.compararEstrategiasCiudades();
-                        break;
-                    }
-                    default:{
-                        break;
-                    }
+                    break;
                 }
-                break;
+                default:{
+                    break;
+                }
             }
-            default:{
-                break;
-            }
-        }
+        } while(menuprincipal != 3);
     }
 }
