@@ -1,5 +1,10 @@
 package AMCP1;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -12,8 +17,47 @@ import java.util.logging.Logger;
 
 public class Ejercicio {
     
-    public Punto[] leeFichero(){
-        return null;
+    public Punto[] leeFichero() throws FileNotFoundException, IOException, Exception{
+        ArrayList<Punto> puntos = new ArrayList();
+        FileReader fr;
+        String url;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Escribe la ruta del fichero que deseas utilizar: ");
+        url = sc.next();
+        fr = new FileReader(url);
+        BufferedReader br = new BufferedReader(fr);
+        String line = "";
+        boolean b = false;
+        while(b == false){
+            line = br.readLine();
+            if("NODE_COORD_SECTION".equals(line)){
+                b = true;
+            }
+        }
+        if(b == true){
+            b = false;
+            while(b == false){
+                line = br.readLine();
+                if("EOF".equals(line)){
+                    b = true;
+                } else{
+                    String[] datos = line.split(" ");
+                    int id = Integer.valueOf(datos[0].trim());
+                    double x = Double.valueOf(datos[1].trim());
+                    double y = Double.valueOf(datos[2].trim());
+                    Punto p = new Punto(x, y);
+                    p.setId(id);
+                    puntos.add(p);
+                }
+            }
+        } else{
+            throw new Exception("Formato de fichero incorrecto.");
+        }
+        if(puntos.size() >= 2){
+            return (Punto[]) puntos.toArray();
+        } else{
+            throw new Exception("Formato de fichero incorrecto."); 
+        }
     }
     
     
@@ -359,63 +403,68 @@ public class Ejercicio {
                 break;
             }
             case 2:{
-                puntos = leeFichero();
-                Scanner sc = new Scanner(System.in);
-                int opt;
-                do{
-                    System.out.println("Indique la estrategia que desea probar: ");
-                    System.out.println("");
-                    System.out.println("1. Busqueda exhaustiva.");
-                    System.out.println("2. Busqueda con poda.");
-                    System.out.println("3. Divide y Venceras.");
-                    System.out.println("4. Divide y Venceras con mejora.");
-                    System.out.println("");
-                    System.out.println("Elige una opcion: ");
-                    opt = sc.nextInt();
-                } while(opt < 1 || opt > 4);
-                switch(opt){
-                    case 1:{
-                        Punto[] solucion = busquedaExhaustiva(puntos);
+                try {
+                    puntos = leeFichero();
+                    Scanner sc = new Scanner(System.in);
+                    int opt;
+                    do{
+                        System.out.println("Indique la estrategia que desea probar: ");
                         System.out.println("");
-                        System.out.println(solucion[0].getPunto());
-                        System.out.println(solucion[1].getPunto());
-                        System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
+                        System.out.println("1. Busqueda exhaustiva.");
+                        System.out.println("2. Busqueda con poda.");
+                        System.out.println("3. Divide y Venceras.");
+                        System.out.println("4. Divide y Venceras con mejora.");
                         System.out.println("");
-                        break;
+                        System.out.println("Elige una opcion: ");
+                        opt = sc.nextInt();
+                    } while(opt < 1 || opt > 4);
+                    switch(opt){
+                        case 1:{
+                            Punto[] solucion = busquedaExhaustiva(puntos);
+                            System.out.println("");
+                            System.out.println(solucion[0].getPunto());
+                            System.out.println(solucion[1].getPunto());
+                            System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
+                            System.out.println("");
+                            break;
+                        }
+                        case 2:{
+                            Punto[] solucion = busquedaPoda(puntos);
+                            System.out.println("");
+                            System.out.println(solucion[0].getPunto());
+                            System.out.println(solucion[1].getPunto());
+                            System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
+                            System.out.println("");
+                            break;
+                        }
+                        case 3:{
+                            Punto[] solucion = divideYvenceras(puntos);
+                            System.out.println("");
+                            System.out.println(solucion[0].getPunto());
+                            System.out.println(solucion[1].getPunto());
+                            System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
+                            System.out.println("");
+                            break;
+                        }
+                        case 4:{
+                            Punto[] solucion = divideYvencerasMejora(puntos);
+                            System.out.println("");
+                            System.out.println(solucion[0].getPunto());
+                            System.out.println(solucion[1].getPunto());
+                            System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
+                            System.out.println("");
+                            break;
+                        }
+                        default:{
+                            break;
+                        }
                     }
-                    case 2:{
-                        Punto[] solucion = busquedaPoda(puntos);
-                        System.out.println("");
-                        System.out.println(solucion[0].getPunto());
-                        System.out.println(solucion[1].getPunto());
-                        System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
-                        System.out.println("");
-                        break;
-                    }
-                    case 3:{
-                        Punto[] solucion = divideYvenceras(puntos);
-                        System.out.println("");
-                        System.out.println(solucion[0].getPunto());
-                        System.out.println(solucion[1].getPunto());
-                        System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
-                        System.out.println("");
-                        break;
-                    }
-                    case 4:{
-                        Punto[] solucion = divideYvencerasMejora(puntos);
-                        System.out.println("");
-                        System.out.println(solucion[0].getPunto());
-                        System.out.println(solucion[1].getPunto());
-                        System.out.println("Distancia: " + Punto.distancia(solucion[0], solucion[1]));
-                        System.out.println("");
-                        break;
-                    }
-                    default:{
-                        break;
-                    }
+                    break;
+                } catch (Exception ex) {
+                    Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                break;
             }
+
             default:{
                 break;
             }
@@ -495,50 +544,55 @@ public class Ejercicio {
                 break;
             }
             case 2:{
-                Scanner sc = new Scanner(System.in);
-                puntos = leeFichero();
-                ciudades = new Ciudad[puntos.length];
-                for(int i = 0; i < puntos.length; i++){
-                    ciudades[i] = new Ciudad(puntos[i]);
-                }
-                int opt;
-                do{
-                    System.out.println("Indique la estrategia que desea probar: ");
-                    System.out.println("");
-                    System.out.println("1. Voraz unidireccional.");
-                    System.out.println("2. Voraz bidireccional.");
-                    System.out.println("");
-                    System.out.println("Elige una opcion: ");
-                    opt = sc.nextInt();
-                } while(opt < 1 || opt > 2);
-                switch(opt){
-                    case 1:{
-                        try {
-                            ciudades[0].setVisitado(true);
-                            SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
-                            solucion.getSolucion();
+                try {
+                    Scanner sc = new Scanner(System.in);
+                    puntos = leeFichero();
+                    ciudades = new Ciudad[puntos.length];
+                    for(int i = 0; i < puntos.length; i++){
+                        ciudades[i] = new Ciudad(puntos[i]);
+                    }
+                    int opt;
+                    do{
+                        System.out.println("Indique la estrategia que desea probar: ");
+                        System.out.println("");
+                        System.out.println("1. Voraz unidireccional.");
+                        System.out.println("2. Voraz bidireccional.");
+                        System.out.println("");
+                        System.out.println("Elige una opcion: ");
+                        opt = sc.nextInt();
+                    } while(opt < 1 || opt > 2);
+                    switch(opt){
+                        case 1:{
+                            try {
+                                ciudades[0].setVisitado(true);
+                                SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
+                                solucion.getSolucion();
+                                break;
+                            } catch (Exception ex) {
+                                Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                        
+                        case 2:{
+                            try {
+                                ciudades[0].setVisitado(true);
+                                SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
+                                solucion.getSolucion();
+                                break;
+                            } catch (Exception ex) {
+                                Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                        default:{
                             break;
-                        } catch (Exception ex) {
-                            Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-
-                    case 2:{
-                        try {
-                            ciudades[0].setVisitado(true);
-                            SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
-                            solucion.getSolucion();
-                            break;
-                        } catch (Exception ex) {
-                            Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    default:{
-                        break;
-                    }
+                    break;
+                } catch (Exception ex) {
+                    Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                break;
             }
+
             default:{
                 break;
             }
