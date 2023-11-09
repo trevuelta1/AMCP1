@@ -42,9 +42,9 @@ public class Ejercicio {
                     b = true;
                 } else{
                     String[] datos = line.split(" ");
-                    int id = Integer.valueOf(datos[0].trim());
-                    double x = Double.valueOf(datos[1].trim());
-                    double y = Double.valueOf(datos[2].trim());
+                    int id = Integer.parseInt(datos[0].trim());
+                    double x = Double.parseDouble(datos[1].trim());
+                    double y = Double.parseDouble(datos[2].trim());
                     Punto p = new Punto(x, y);
                     p.setId(id);
                     puntos.add(p);
@@ -122,10 +122,10 @@ public class Ejercicio {
         solucion[0] = puntos[0];
         solucion[1] = puntos[1];
         double dminima = Punto.distancia(puntos[0], puntos[1]);
-        boolean b = false;
         int i = 0;
-        while(b == false && i < puntos.length){
+        while(i < puntos.length){
             int j = i + 1;
+            boolean b = false;
             while(b == false && j < puntos.length){
                 double dist = puntos[i].getX() - puntos[j].getX();
                 if(dist < 0){

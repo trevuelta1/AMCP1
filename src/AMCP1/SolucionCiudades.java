@@ -12,8 +12,8 @@ public class SolucionCiudades {
     private Ciudad[] ciudades;
     private double[] distancias;
     private double distanciaTotal;
-    private static int inc = 0;
-    private static int ind = 0;
+    private int inc = 0;
+    private int ind = 0;
     
     public SolucionCiudades(Ciudad[] ciudadesIniciales){
         this.ciudades = new Ciudad[ciudadesIniciales.length + 1];
@@ -22,20 +22,25 @@ public class SolucionCiudades {
     }
     
     public Ciudad[] getCiudades(){return this.ciudades;}
+    
     public void addCiudad(Ciudad c){
         if(inc < this.ciudades.length){
             this.ciudades[inc] = c;
             inc++;
-        }
+        } 
     }
+    
     public double[] getDistancias(){return this.distancias;}
+    
     public void addDistancia(double dist){
         if(ind < this.distancias.length){
             this.distancias[ind] = dist;
             ind++;
-        }
+        } 
     }
+    
     public double getDistanciaTotal(){return this.distanciaTotal;}
+    
     public boolean actualizarDistanciaTotal(){
         double primera = this.distanciaTotal;
         for(int i = 0; i < this.distancias.length; i++){
@@ -43,6 +48,7 @@ public class SolucionCiudades {
         }
         return (primera != this.distanciaTotal);
     }
+    
     public void getSolucion(){
         System.out.println("SOLUTION: " + this.distanciaTotal);
         System.out.println("TOUR_SECTION");
