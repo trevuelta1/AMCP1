@@ -14,10 +14,9 @@ import java.util.logging.Logger;
  *
  * @author USUARIO1
  */
-
 public class Ejercicio {
-    
-    public Punto[] leeFichero() throws FileNotFoundException, IOException, Exception{
+
+    public Punto[] leeFichero() throws FileNotFoundException, IOException, Exception {
         ArrayList<Punto> puntos = new ArrayList();
         FileReader fr;
         String url;
@@ -28,19 +27,19 @@ public class Ejercicio {
         BufferedReader br = new BufferedReader(fr);
         String line = "";
         boolean b = false;
-        while(b == false){
+        while (b == false) {
             line = br.readLine();
-            if("NODE_COORD_SECTION".equals(line)){
+            if ("NODE_COORD_SECTION".equals(line)) {
                 b = true;
             }
         }
-        if(b == true){
+        if (b == true) {
             b = false;
-            while(b == false){
+            while (b == false) {
                 line = br.readLine();
-                if("EOF".equals(line)){
+                if ("EOF".equals(line)) {
                     b = true;
-                } else{
+                } else {
                     String[] datos = line.split(" ");
                     int id = Integer.parseInt(datos[0].trim());
                     double x = Double.parseDouble(datos[1].trim());
@@ -50,17 +49,16 @@ public class Ejercicio {
                     puntos.add(p);
                 }
             }
-        } else{
+        } else {
             throw new Exception("Formato de fichero incorrecto.");
         }
-        if(puntos.size() >= 2){
+        if (puntos.size() >= 2) {
             return puntos.toArray(new Punto[puntos.size()]);
-        } else{
-            throw new Exception("El fichero no tiene puntos suficientes."); 
+        } else {
+            throw new Exception("El fichero no tiene puntos suficientes.");
         }
     }
-    
-    
+
     private int particion(Punto vector[], int izquierda, int derecha) {
         double pivote = vector[izquierda].getX();
         // Ciclo infinito
@@ -73,7 +71,7 @@ public class Ejercicio {
             }
             if (izquierda >= derecha) {
                 return derecha;
-            } else{
+            } else {
                 Punto temporal = vector[izquierda];
                 vector[izquierda] = vector[derecha];
                 vector[derecha] = temporal;
@@ -82,8 +80,7 @@ public class Ejercicio {
             }
         }
     }
-    
-    
+
     private void quicksort(Punto vector[], int izquierda, int derecha) {
         if (izquierda < derecha) {
             int indiceParticion = particion(vector, izquierda, derecha);
@@ -91,21 +88,19 @@ public class Ejercicio {
             quicksort(vector, indiceParticion + 1, derecha);
         }
     }
-    
-    
-    public void quicksort(Punto vector[]){
+
+    public void quicksort(Punto vector[]) {
         quicksort(vector, 0, vector.length - 1);
     }
-    
-    
-    public Punto[] busquedaExhaustiva(Punto[] puntos){
+
+    public Punto[] busquedaExhaustiva(Punto[] puntos) {
         Punto[] solucion = new Punto[2];
         solucion[0] = puntos[0];
         solucion[1] = puntos[1];
         double dminima = Punto.distancia(puntos[0], puntos[1]);
-        for(int i = 0; i < puntos.length; i++){
-            for(int j = i + 1; j < puntos.length; j++){
-                if(Punto.distancia(puntos[i], puntos[j]) < dminima){
+        for (int i = 0; i < puntos.length; i++) {
+            for (int j = i + 1; j < puntos.length; j++) {
+                if (Punto.distancia(puntos[i], puntos[j]) < dminima) {
                     dminima = Punto.distancia(puntos[i], puntos[j]);
                     solucion[0] = puntos[i];
                     solucion[1] = puntos[j];
@@ -114,31 +109,30 @@ public class Ejercicio {
         }
         return solucion;
     }
-    
-    
-    public Punto[] busquedaPoda(Punto[] puntos){
+
+    public Punto[] busquedaPoda(Punto[] puntos) {
         Punto[] solucion = new Punto[2];
         quicksort(puntos);
         solucion[0] = puntos[0];
         solucion[1] = puntos[1];
         double dminima = Punto.distancia(puntos[0], puntos[1]);
         int i = 0;
-        while(i < puntos.length){
+        while (i < puntos.length) {
             int j = i + 1;
             boolean b = false;
-            while(b == false && j < puntos.length){
+            while (b == false && j < puntos.length) {
                 double dist = puntos[i].getX() - puntos[j].getX();
-                if(dist < 0){
+                if (dist < 0) {
                     dist = dist * -1;
                 }
-                if(dist < dminima){
-                    if(Punto.distancia(puntos[i], puntos[j]) < dminima){
+                if (dist < dminima) {
+                    if (Punto.distancia(puntos[i], puntos[j]) < dminima) {
                         dminima = Punto.distancia(puntos[i], puntos[j]);
                         solucion[0] = puntos[i];
                         solucion[1] = puntos[j];
                     }
                     j++;
-                } else{
+                } else {
                     b = true;
                 }
             }
@@ -146,105 +140,105 @@ public class Ejercicio {
         }
         return solucion;
     }
-    
-    
-    public Punto[] divideYvenceras(Punto[] puntos){
+
+    public Punto[] divideYvenceras(Punto[] puntos, int iz, int de) {
         Punto[] solucion = new Punto[2];
         quicksort(puntos);
-        if(puntos.length > 2){ //conjunto de más de 2 puntos
-            int mitad = puntos.length / 2; //divide en 2 subconjuntos
-            Punto[] izq = new Punto[mitad];
-            Punto[] der = new Punto[puntos.length - mitad];
-            for(int i = 0; i < mitad; i++){
-                izq[i] = puntos[i];
-            }
-            for(int i = mitad; i < puntos.length; i++){
-                der[i - mitad] = puntos[i];
-            }
-            Punto[] solucionIzq = divideYvenceras(izq); //vuelve a resolver recursivamente hasta que quedan conjuntos de 2 ó 1 puntos
-            Punto[] solucionDer = divideYvenceras(der);
+        if (de - iz + 1 > 3) { //conjunto de más de 2 puntos
+            int mitad = iz + ((de - iz + 1) / 2); //divide en 2 subconjuntos
+            Punto[] solucionIzq = divideYvenceras(puntos, iz, mitad - 1); //vuelve a resolver recursivamente hasta que quedan conjuntos de 2 ó 1 puntos
+            Punto[] solucionDer = divideYvenceras(puntos, mitad, de);
             double dizq = Punto.distancia(solucionIzq[0], solucionIzq[1]);
             double dder = Punto.distancia(solucionDer[0], solucionDer[1]);
             double dminima; //cálculo de distancia mínima
-            if(dizq == 0){ //solo el subconjunto izquierdo puede ser de un punto, en cuyo caso, se toma como distancia mínima la del subconjunto derecho
+            if (dizq < dder) {
+                dminima = dizq;
+                solucion = solucionIzq;
+            } else {
                 dminima = dder;
                 solucion = solucionDer;
-            } else{
-                if(dizq < dder){
-                    dminima = dizq;
-                    solucion = solucionIzq;
-                } else{
-                    dminima = dder;
-                    solucion = solucionDer;
-                }
             }
             boolean b = false; //una vez tenemos la distancia mínima de la parte izquierda y la derecha, se comprueba si alguna distancia en la frontera es menor
-            int i = 0;
-            double xminima = puntos[mitad].getX() - dminima;
-            if(xminima < 0){xminima = 0;}
-            double xmaxima = puntos[mitad].getX() + dminima;
-            while(b == false && i < puntos.length){
-                if(puntos[i].getX() >= xminima){
+            int i = iz;
+            double xminima = puntos[mitad].getX() - 1 - dminima;
+            if (xminima < 0) {
+                xminima = 0;
+            }
+            double xmaxima = puntos[mitad].getX() + 1 + dminima;
+            while (b == false && i <= de) {
+                if (puntos[i].getX() >= xminima) {
                     b = true;
-                } else{i++;}
+                } else {
+                    i++;
+                }
             }
             b = false;
-            while(b == false && i < puntos.length){
+            while (b == false && i <= de) {
                 int j = i + 1;
-                while(b == false && j < puntos.length){
-                    if(puntos[j].getX() <= xmaxima){
-                        if(Punto.distancia(puntos[i], puntos[j]) < dminima){
+                while (b == false && j <= de) {
+                    if (puntos[j].getX() <= xmaxima) {
+                        if (Punto.distancia(puntos[i], puntos[j]) < dminima) {
                             solucion[0] = puntos[i];
                             solucion[1] = puntos[j];
                         }
                         j++;
-                    } else{b = true;}
+                    } else {
+                        b = true;
+                    }
                 }
                 i++;
             }
-        } else if(puntos.length == 2){ //conjunto de 2 puntos
-            solucion[0] = puntos[0];
-            solucion[1] = puntos[1];
-        } else{ //conjunto de 1 punto
-            solucion[0] = puntos[0];
-            solucion[1] = puntos[0];
+        } else if (de - iz + 1 == 2) { //conjunto de 2 puntos
+            solucion[0] = puntos[iz];
+            solucion[1] = puntos[de];
+        } else if (de - iz + 1 == 3) { //conjunto de 3 puntos
+            double dist1 = Punto.distancia(puntos[iz], puntos[iz + 1]);
+            double dist2 = Punto.distancia(puntos[iz + 1], puntos[de]);
+            double dist3 = Punto.distancia(puntos[iz], puntos[de]);
+            if (dist1 < dist2 && dist1 < dist3) {
+                solucion[0] = puntos[iz];
+                solucion[1] = puntos[iz + 1];
+            } else if (dist2 < dist3) {
+                solucion[0] = puntos[iz + 1];
+                solucion[1] = puntos[de];
+            } else {
+                solucion[0] = puntos[iz];
+                solucion[1] = puntos[de];
+            }
         }
         return solucion;
     }
-    
-    
-    public Punto[] divideYvencerasMejora(Punto[] puntos){
+
+    public Punto[] divideYvencerasMejora(Punto[] puntos) {
         return null;
     }
-    
-    
-    public Ciudad ciudadMasCercanaSinVisitar(Ciudad inicio, Ciudad[] ciudades) throws Exception{
+
+    public Ciudad ciudadMasCercanaSinVisitar(Ciudad inicio, Ciudad[] ciudades) throws Exception {
         double dmin = Double.MAX_VALUE;
         int indice = -1;
-        for(int i = 0; i < ciudades.length; i++){
-            if(ciudades[i].getCoordenadas().getId() != inicio.getCoordenadas().getId()){
-                if(ciudades[i].getVisitado() == false){
+        for (int i = 0; i < ciudades.length; i++) {
+            if (ciudades[i].getCoordenadas().getId() != inicio.getCoordenadas().getId()) {
+                if (ciudades[i].getVisitado() == false) {
                     double distancia = Punto.distancia(ciudades[i].getCoordenadas(), inicio.getCoordenadas());
-                    if(distancia < dmin){
+                    if (distancia < dmin) {
                         dmin = distancia;
                         indice = i;
                     }
                 }
             }
         }
-        if(indice != -1){
+        if (indice != -1) {
             ciudades[indice].setVisitado(true);
             return ciudades[indice];
-        } else{
+        } else {
             throw new Exception("Todas las ciudades han sido visitadas.");
         }
     }
-    
-    
-    public SolucionCiudades vorazCiudades(Ciudad[] ciudades, Ciudad inicio) throws Exception{
+
+    public SolucionCiudades vorazCiudades(Ciudad[] ciudades, Ciudad inicio) throws Exception {
         SolucionCiudades solucion = new SolucionCiudades(ciudades);
         solucion.addCiudad(inicio);
-        for(int i = 0; i < ciudades.length - 1; i++){
+        for (int i = 0; i < ciudades.length - 1; i++) {
             Ciudad c = ciudadMasCercanaSinVisitar(inicio, ciudades);
             solucion.addCiudad(c);
             solucion.addDistancia(Punto.distancia(inicio.getCoordenadas(), c.getCoordenadas()));
@@ -253,19 +247,70 @@ public class Ejercicio {
         solucion.addCiudad(solucion.getCiudades()[0]);
         solucion.addDistancia(Punto.distancia(solucion.getCiudades()[0].getCoordenadas(), inicio.getCoordenadas()));
         solucion.actualizarDistanciaTotal();
-        for(int i = 0; i < ciudades.length; i++){
+        for (int i = 0; i < ciudades.length; i++) {
             ciudades[i].setVisitado(false);
         }
         return solucion;
     }
-    
-    
-    public SolucionCiudades vorazDoble(Ciudad[] ciudades, Ciudad inicio) throws Exception{
-        return null;
+
+    public SolucionCiudades vorazDoble(Ciudad[] ciudades, Ciudad inicio) throws Exception {
+        SolucionCiudades solucion = new SolucionCiudades(ciudades);
+        solucion.addCiudad(inicio);
+        Ciudad[] camino = new Ciudad[ciudades.length * 2]; //tabla doble de ciudades
+        int indizq = ciudades.length; //índice izquierdo
+        int indder = ciudades.length + 1; //índice derecho
+        Ciudad iz = inicio; //extremo izquierdo en la tabla doble de ciudades
+        Ciudad de = ciudadMasCercanaSinVisitar(inicio, ciudades); //extremo derecho en la tabla doble de ciudades
+        camino[indizq] = iz;
+        camino[indder] = de;
+        for (int i = 0; i < ciudades.length - 2; i++) {
+            Ciudad[] izq = new Ciudad[ciudades.length];
+            Ciudad[] der = new Ciudad[ciudades.length];
+            izq = ciudades.clone(); //se crean dos copias de ciudades, para que el algoritmo ciudadMasCercanaSinVisitar no marque como visitada ninguna ciudad directamente en la tabla ciudades.
+            der = ciudades.clone();
+            Ciudad diz = ciudadMasCercanaSinVisitar(iz, izq); //ciudad más cercana al extremo izquierdo
+            Ciudad dde = ciudadMasCercanaSinVisitar(de, der); //ciudad más cercana al extremo derecho
+            if (Punto.distancia(diz.getCoordenadas(), iz.getCoordenadas()) < Punto.distancia(dde.getCoordenadas(), de.getCoordenadas())) { //en función de cuál de las anteriores sea más cercana, se modifica camino y se reestablece ciudades con la copia correcta
+                indizq--;
+                camino[indizq] = diz;
+                iz = diz;
+                ciudades = izq.clone();
+            } else {
+                indder++;
+                camino[indder] = dde;
+                de = dde;
+                ciudades = der.clone();
+            }
+        }
+        boolean b = false; //a partir de aquí se prepara la solución
+        int i = ciudades.length + 1;
+        while (b == false) {
+            solucion.addCiudad(camino[i]);
+            solucion.addDistancia(Punto.distancia(camino[i].getCoordenadas(), camino[i - 1].getCoordenadas()));
+            if (camino[i + 1] == null) {
+                b = true;
+            } else {
+                i++;
+            }
+        }
+        i = 0;
+        while (camino[i] == null) {
+            i++;
+        }
+        for (int j = i; j < ciudades.length; j++) {
+            solucion.addCiudad(camino[j]);
+            solucion.addDistancia(Punto.distancia(solucion.getCiudades()[solucion.getCiudades().length - 1].getCoordenadas(), solucion.getCiudades()[solucion.getCiudades().length - 2].getCoordenadas()));
+        }
+        solucion.addCiudad(solucion.getCiudades()[0]);
+        solucion.addDistancia(Punto.distancia(solucion.getCiudades()[0].getCoordenadas(), solucion.getCiudades()[ciudades.length - 1].getCoordenadas()));
+        solucion.actualizarDistanciaTotal();
+        for (int k = 0; k < ciudades.length; k++) {
+            ciudades[k].setVisitado(false);
+        }
+        return solucion;
     }
-    
-    
-    public int menuPrincipal(){
+
+    public int menuPrincipal() {
         int a = 0;
         System.out.println("Indique si desea trabajar con conjuntos de puntos o ciudades:");
         System.out.println("");
@@ -273,16 +318,15 @@ public class Ejercicio {
         System.out.println("2. Conjunto de ciudades (estrategias voraces unilateral y bilateral).");
         System.out.println("3. Salir.");
         System.out.println("");
-        do{
+        do {
             System.out.println("Elija una opcion: ");
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-        } while(a < 1 || a > 3);
+        } while (a < 1 || a > 3);
         return a;
     }
-    
-    
-    public int menuPuntos(){
+
+    public int menuPuntos() {
         int a = 0;
         System.out.println("Indique la opcion que desee:");
         System.out.println("");
@@ -291,16 +335,15 @@ public class Ejercicio {
         System.out.println("3. Comparar todas las estrategias con todos los puntos en la misma vertical.");
         System.out.println("4. Salir.");
         System.out.println("");
-        do{
+        do {
             System.out.println("Elija una opcion: ");
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-        } while(a < 1 || a > 4);
+        } while (a < 1 || a > 4);
         return a;
     }
-    
-    
-    public int menuCiudades(){
+
+    public int menuCiudades() {
         int a = 0;
         System.out.println("Indique la opcion que desee:");
         System.out.println("");
@@ -308,16 +351,15 @@ public class Ejercicio {
         System.out.println("2. Comparar estrategias.");
         System.out.println("3. Salir.");
         System.out.println("");
-        do{
+        do {
             System.out.println("Elija una opcion: ");
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-        } while(a < 1 || a > 3);
+        } while (a < 1 || a > 3);
         return a;
     }
-    
-    
-    public void probarEstrategiaPuntos(){
+
+    public void probarEstrategiaPuntos() {
         int a = 0;
         Punto[] puntos;
         System.out.println("Indique si desea generar un conjunto aleatorio o leer un conjunto desde fichero:");
@@ -326,29 +368,29 @@ public class Ejercicio {
         System.out.println("2. Conjunto de puntos desde fichero.");
         System.out.println("3. Salir.");
         System.out.println("");
-        do{
+        do {
             System.out.println("Elija una opcion: ");
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-        } while(a < 1 || a > 3);
-        switch(a){
-            case 1:{
+        } while (a < 1 || a > 3);
+        switch (a) {
+            case 1: {
                 Random x = new Random();
                 x.setSeed(System.currentTimeMillis());
                 Random y = new Random();
                 y.setSeed(System.currentTimeMillis() + 1);
                 int talla;
                 Scanner sc = new Scanner(System.in);
-                do{
+                do {
                     System.out.println("Indique cuantos puntos debe tener el conjunto (el valor debe ser mayor o igual a 2): ");
                     talla = sc.nextInt();
-                } while(talla < 2);
+                } while (talla < 2);
                 puntos = new Punto[talla];
-                for(int i = 0; i < talla; i++){
+                for (int i = 0; i < talla; i++) {
                     puntos[i] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                 }
                 int opt;
-                do{
+                do {
                     System.out.println("Indique la estrategia que desea probar: ");
                     System.out.println("");
                     System.out.println("1. Busqueda exhaustiva.");
@@ -358,9 +400,9 @@ public class Ejercicio {
                     System.out.println("");
                     System.out.println("Elige una opcion: ");
                     opt = sc.nextInt();
-                } while(opt < 1 || opt > 4);
-                switch(opt){
-                    case 1:{
+                } while (opt < 1 || opt > 4);
+                switch (opt) {
+                    case 1: {
                         Punto[] solucion = busquedaExhaustiva(puntos);
                         System.out.println("");
                         System.out.println(solucion[0].getPunto());
@@ -369,7 +411,7 @@ public class Ejercicio {
                         System.out.println("");
                         break;
                     }
-                    case 2:{
+                    case 2: {
                         Punto[] solucion = busquedaPoda(puntos);
                         System.out.println("");
                         System.out.println(solucion[0].getPunto());
@@ -378,8 +420,8 @@ public class Ejercicio {
                         System.out.println("");
                         break;
                     }
-                    case 3:{
-                        Punto[] solucion = divideYvenceras(puntos);
+                    case 3: {
+                        Punto[] solucion = divideYvenceras(puntos, 0, puntos.length - 1);
                         System.out.println("");
                         System.out.println(solucion[0].getPunto());
                         System.out.println(solucion[1].getPunto());
@@ -387,7 +429,7 @@ public class Ejercicio {
                         System.out.println("");
                         break;
                     }
-                    case 4:{
+                    case 4: {
                         Punto[] solucion = divideYvencerasMejora(puntos);
                         System.out.println("");
                         System.out.println(solucion[0].getPunto());
@@ -396,18 +438,18 @@ public class Ejercicio {
                         System.out.println("");
                         break;
                     }
-                    default:{
+                    default: {
                         break;
                     }
                 }
                 break;
             }
-            case 2:{
+            case 2: {
                 try {
                     puntos = leeFichero();
                     Scanner sc = new Scanner(System.in);
                     int opt;
-                    do{
+                    do {
                         System.out.println("Indique la estrategia que desea probar: ");
                         System.out.println("");
                         System.out.println("1. Busqueda exhaustiva.");
@@ -417,9 +459,9 @@ public class Ejercicio {
                         System.out.println("");
                         System.out.println("Elige una opcion: ");
                         opt = sc.nextInt();
-                    } while(opt < 1 || opt > 4);
-                    switch(opt){
-                        case 1:{
+                    } while (opt < 1 || opt > 4);
+                    switch (opt) {
+                        case 1: {
                             Punto[] solucion = busquedaExhaustiva(puntos);
                             System.out.println("");
                             System.out.println(solucion[0].getPunto());
@@ -428,7 +470,7 @@ public class Ejercicio {
                             System.out.println("");
                             break;
                         }
-                        case 2:{
+                        case 2: {
                             Punto[] solucion = busquedaPoda(puntos);
                             System.out.println("");
                             System.out.println(solucion[0].getPunto());
@@ -437,8 +479,8 @@ public class Ejercicio {
                             System.out.println("");
                             break;
                         }
-                        case 3:{
-                            Punto[] solucion = divideYvenceras(puntos);
+                        case 3: {
+                            Punto[] solucion = divideYvenceras(puntos, 0, puntos.length - 1);
                             System.out.println("");
                             System.out.println(solucion[0].getPunto());
                             System.out.println(solucion[1].getPunto());
@@ -446,7 +488,7 @@ public class Ejercicio {
                             System.out.println("");
                             break;
                         }
-                        case 4:{
+                        case 4: {
                             Punto[] solucion = divideYvencerasMejora(puntos);
                             System.out.println("");
                             System.out.println(solucion[0].getPunto());
@@ -455,7 +497,7 @@ public class Ejercicio {
                             System.out.println("");
                             break;
                         }
-                        default:{
+                        default: {
                             break;
                         }
                     }
@@ -465,14 +507,13 @@ public class Ejercicio {
                 }
             }
 
-            default:{
+            default: {
                 break;
             }
         }
     }
-    
-    
-    public void probarEstrategiaCiudades(){
+
+    public void probarEstrategiaCiudades() {
         int a = 0;
         Punto[] puntos;
         Ciudad[] ciudades;
@@ -482,31 +523,31 @@ public class Ejercicio {
         System.out.println("2. Conjunto de ciudades desde fichero.");
         System.out.println("3. Salir.");
         System.out.println("");
-        do{
+        do {
             System.out.println("Elija una opcion: ");
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-        } while(a < 1 || a > 3);
-        switch(a){
-            case 1:{
+        } while (a < 1 || a > 3);
+        switch (a) {
+            case 1: {
                 Random x = new Random();
                 x.setSeed(System.currentTimeMillis());
                 Random y = new Random();
                 y.setSeed(System.currentTimeMillis() + 1);
                 int talla;
                 Scanner sc = new Scanner(System.in);
-                do{
+                do {
                     System.out.println("Indique cuantos puntos debe tener el conjunto (el valor debe ser mayor o igual a 2): ");
                     talla = sc.nextInt();
-                } while(talla < 2);
+                } while (talla < 2);
                 puntos = new Punto[talla];
                 ciudades = new Ciudad[talla];
-                for(int i = 0; i < talla; i++){
+                for (int i = 0; i < talla; i++) {
                     puntos[i] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                     ciudades[i] = new Ciudad(puntos[i]);
                 }
                 int opt;
-                do{
+                do {
                     System.out.println("Indique la estrategia que desea probar: ");
                     System.out.println("");
                     System.out.println("1. Voraz unidireccional.");
@@ -514,9 +555,9 @@ public class Ejercicio {
                     System.out.println("");
                     System.out.println("Elige una opcion: ");
                     opt = sc.nextInt();
-                } while(opt < 1 || opt > 2);
-                switch(opt){
-                    case 1:{
+                } while (opt < 1 || opt > 2);
+                switch (opt) {
+                    case 1: {
                         try {
                             ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
@@ -527,7 +568,7 @@ public class Ejercicio {
                         }
                     }
 
-                    case 2:{
+                    case 2: {
                         try {
                             ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
@@ -537,22 +578,22 @@ public class Ejercicio {
                             Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    default:{
+                    default: {
                         break;
                     }
                 }
                 break;
             }
-            case 2:{
+            case 2: {
                 try {
                     Scanner sc = new Scanner(System.in);
                     puntos = leeFichero();
                     ciudades = new Ciudad[puntos.length];
-                    for(int i = 0; i < puntos.length; i++){
+                    for (int i = 0; i < puntos.length; i++) {
                         ciudades[i] = new Ciudad(puntos[i]);
                     }
                     int opt;
-                    do{
+                    do {
                         System.out.println("Indique la estrategia que desea probar: ");
                         System.out.println("");
                         System.out.println("1. Voraz unidireccional.");
@@ -560,9 +601,9 @@ public class Ejercicio {
                         System.out.println("");
                         System.out.println("Elige una opcion: ");
                         opt = sc.nextInt();
-                    } while(opt < 1 || opt > 2);
-                    switch(opt){
-                        case 1:{
+                    } while (opt < 1 || opt > 2);
+                    switch (opt) {
+                        case 1: {
                             try {
                                 ciudades[0].setVisitado(true);
                                 SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
@@ -572,8 +613,8 @@ public class Ejercicio {
                                 Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        
-                        case 2:{
+
+                        case 2: {
                             try {
                                 ciudades[0].setVisitado(true);
                                 SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
@@ -583,7 +624,7 @@ public class Ejercicio {
                                 Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        default:{
+                        default: {
                             break;
                         }
                     }
@@ -593,14 +634,13 @@ public class Ejercicio {
                 }
             }
 
-            default:{
+            default: {
                 break;
             }
         }
     }
-    
-    
-    public void compararEstrategiasPuntos(){
+
+    public void compararEstrategiasPuntos() {
         int size = 500;
         Punto[] puntos;
         Random x = new Random();
@@ -612,10 +652,10 @@ public class Ejercicio {
         System.out.println("");
         System.out.println("------------------------------------------------------------------------------------------");
         System.out.println("");
-        for(int a = 0; a < 10; a++){
-            for(int i = 0; i < 10; i++){
+        for (int a = 0; a < 10; a++) {
+            for (int i = 0; i < 10; i++) {
                 puntos = new Punto[size];
-                for(int j = 0; j < size; j++){
+                for (int j = 0; j < size; j++) {
                     puntos[j] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                 }
                 long texh = System.currentTimeMillis();
@@ -627,7 +667,7 @@ public class Ejercicio {
                 tpod = System.currentTimeMillis() - tpod;
                 totalpod = totalpod + tpod;
                 long tdyv = System.currentTimeMillis();
-                divideYvenceras(puntos);
+                divideYvenceras(puntos, 0, puntos.length - 1);
                 tdyv = System.currentTimeMillis() - tdyv;
                 totaldyv = totaldyv + tdyv;
                 long tdyvmej = System.currentTimeMillis();
@@ -637,12 +677,14 @@ public class Ejercicio {
             }
             System.out.println("\t" + size + "\t" + totalexh / 10 + "\t" + totalpod / 10 + "\t" + totaldyv / 10 + "\t" + totaldyvmej / 10);
             size = size + 500;
-            totalexh = 0; totalpod = 0; totaldyv = 0; totaldyvmej = 0;
+            totalexh = 0;
+            totalpod = 0;
+            totaldyv = 0;
+            totaldyvmej = 0;
         }
     }
-    
-    
-    public void compararEstrategiasMismaVertical(){
+
+    public void compararEstrategiasMismaVertical() {
         int size = 500;
         Punto[] puntos;
         Random y = new Random();
@@ -652,10 +694,10 @@ public class Ejercicio {
         System.out.println("");
         System.out.println("------------------------------------------------------------------------------------------");
         System.out.println("");
-        for(int a = 0; a < 10; a++){
-            for(int i = 0; i < 10; i++){
+        for (int a = 0; a < 10; a++) {
+            for (int i = 0; i < 10; i++) {
                 puntos = new Punto[size];
-                for(int j = 0; j < size; j++){
+                for (int j = 0; j < size; j++) {
                     puntos[j] = new Punto(50, y.nextDouble() * 1000);
                 }
                 long texh = System.currentTimeMillis();
@@ -667,7 +709,7 @@ public class Ejercicio {
                 tpod = System.currentTimeMillis() - tpod;
                 totalpod = totalpod + tpod;
                 long tdyv = System.currentTimeMillis();
-                divideYvenceras(puntos);
+                divideYvenceras(puntos, 0, puntos.length - 1);
                 tdyv = System.currentTimeMillis() - tdyv;
                 totaldyv = totaldyv + tdyv;
                 long tdyvmej = System.currentTimeMillis();
@@ -677,13 +719,14 @@ public class Ejercicio {
             }
             System.out.println("\t" + size + "\t" + totalexh / 10 + "\t" + totalpod / 10 + "\t" + totaldyv / 10 + "\t" + totaldyvmej / 10);
             size = size + 500;
-            totalexh = 0; totalpod = 0; totaldyv = 0; totaldyvmej = 0;
+            totalexh = 0;
+            totalpod = 0;
+            totaldyv = 0;
+            totaldyvmej = 0;
         }
     }
-    
-    
-    
-    public void compararEstrategiasCiudades(){
+
+    public void compararEstrategiasCiudades() {
         int size = 500;
         Punto[] puntos;
         Ciudad[] ciudades;
@@ -696,12 +739,12 @@ public class Ejercicio {
         System.out.println("");
         System.out.println("------------------------------------------------------------------");
         System.out.println("");
-        for(int a = 0; a < 10; a++){
-            for(int i = 0; i < 100; i++){
+        for (int a = 0; a < 10; a++) {
+            for (int i = 0; i < 100; i++) {
                 try {
                     puntos = new Punto[size];
                     ciudades = new Ciudad[size];
-                    for(int j = 0; j < size; j++){
+                    for (int j = 0; j < size; j++) {
                         puntos[j] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                         ciudades[j] = new Ciudad(puntos[j]);
                     }
@@ -721,59 +764,59 @@ public class Ejercicio {
             }
             System.out.println("\t" + size + "\t" + totaluni / 100 + "\t" + totalbi / 100);
             size = size + 500;
-            totaluni = 0; totalbi = 0;
+            totaluni = 0;
+            totalbi = 0;
         }
     }
-    
-    
+
     public static void main(String[] args) {
         Ejercicio ej = new Ejercicio();
         int menuprincipal;
-        do{
+        do {
             menuprincipal = ej.menuPrincipal();
-            switch(menuprincipal){
-                case 1:{
+            switch (menuprincipal) {
+                case 1: {
                     int menupuntos = ej.menuPuntos();
-                    switch(menupuntos){
-                        case 1:{
+                    switch (menupuntos) {
+                        case 1: {
                             ej.probarEstrategiaPuntos();
                             break;
                         }
-                        case 2:{
+                        case 2: {
                             ej.compararEstrategiasPuntos();
                             break;
                         }
-                        case 3:{
+                        case 3: {
                             ej.compararEstrategiasMismaVertical();
                             break;
                         }
-                        default:{
+                        default: {
                             break;
                         }
                     }
                     break;
                 }
-                case 2:{
+                case 2: {
                     int menuciudades = ej.menuCiudades();
-                    switch(menuciudades){
-                        case 1:{
+                    switch (menuciudades) {
+                        case 1: {
                             ej.probarEstrategiaCiudades();
                             break;
                         }
-                        case 2:{
+                        case 2: {
                             ej.compararEstrategiasCiudades();
                             break;
                         }
-                        default:{
+                        default: {
                             break;
                         }
                     }
                     break;
                 }
-                default:{
+                default: {
                     break;
                 }
             }
-        } while(menuprincipal != 3);
+        } while (menuprincipal != 3);
     }
 }
