@@ -19,7 +19,7 @@ public class Ejercicio {
 
     public static int pt = 0;
     public static int ct = 0;
-    
+
     public Punto[] leeFichero() throws FileNotFoundException, IOException, Exception {
         ArrayList<Punto> puntos = new ArrayList();
         FileReader fr;
@@ -62,8 +62,8 @@ public class Ejercicio {
             throw new Exception("El fichero no tiene puntos suficientes.");
         }
     }
-    
-    public void escribeFicheroTSP(Punto[] puntos){
+
+    public void escribeFicheroTSP(Punto[] puntos) {
         FileWriter fw = null;
         try {
             fw = new FileWriter("files\\puntostest" + pt + ".tsp");
@@ -73,7 +73,7 @@ public class Ejercicio {
             fw.write("DIMENSION: " + puntos.length + "\n");
             fw.write("EDGE_WEIGHT_TYPE: EUC_2D\n");
             fw.write("NODE_COORD_SECTION\n");
-            for(int i = 0; i < puntos.length; i++){
+            for (int i = 0; i < puntos.length; i++) {
                 fw.write(puntos[i].getId() + " " + puntos[i].getX() + " " + puntos[i].getY() + "\n");
             }
         } catch (IOException ex) {
@@ -86,8 +86,8 @@ public class Ejercicio {
             }
         }
     }
-    
-    public void escribeFicheroTOUR(SolucionCiudades sol){
+
+    public void escribeFicheroTOUR(SolucionCiudades sol) {
         FileWriter fw = null;
         try {
             fw = new FileWriter("files\\soluCiudades" + ct + ".opt.tour");
@@ -96,7 +96,7 @@ public class Ejercicio {
             fw.write("DIMENSION: " + sol.getDistancias().length + "\n");
             fw.write("SOLUTION: " + sol.getDistanciaTotal() + "\n");
             fw.write("TOUR_SECTION\n");
-            for(int i = 0; i < sol.getDistancias().length; i++){
+            for (int i = 0; i < sol.getDistancias().length; i++) {
                 fw.write(sol.getDistancias()[i] + " - " + sol.getCiudades()[i].getCoordenadas().getId() + ", " + sol.getCiudades()[i + 1].getCoordenadas().getId() + "\n");
             }
         } catch (IOException ex) {
@@ -143,7 +143,7 @@ public class Ejercicio {
     public void quicksortX(Punto vector[]) {
         quicksortX(vector, 0, vector.length - 1);
     }
-    
+
     private int particionY(Punto vector[], int izquierda, int derecha) {
         double pivote = vector[izquierda].getY();
         // Ciclo infinito
@@ -185,8 +185,9 @@ public class Ejercicio {
         double dminima = Punto.distancia(puntos[0], puntos[1]);
         for (int i = 0; i < puntos.length; i++) {
             for (int j = i + 1; j < puntos.length; j++) {
-                if (Punto.distancia(puntos[i], puntos[j]) < dminima) {
-                    dminima = Punto.distancia(puntos[i], puntos[j]);
+                double distancia = Punto.distancia(puntos[i], puntos[j]);
+                if (distancia < dminima) {
+                    dminima = distancia;
                     solucion[0] = puntos[i];
                     solucion[1] = puntos[j];
                 }
@@ -211,8 +212,9 @@ public class Ejercicio {
                     dist = dist * -1;
                 }
                 if (dist < dminima) {
-                    if (Punto.distancia(puntos[i], puntos[j]) < dminima) {
-                        dminima = Punto.distancia(puntos[i], puntos[j]);
+                    double distancia = Punto.distancia(puntos[i], puntos[j]);
+                    if (distancia < dminima) {
+                        dminima = distancia;
                         solucion[0] = puntos[i];
                         solucion[1] = puntos[j];
                     }
@@ -245,11 +247,11 @@ public class Ejercicio {
             }
             boolean b = false; //una vez tenemos la distancia mínima de la parte izquierda y la derecha, se comprueba si alguna distancia en la frontera es menor
             int i = iz;
-            double xminima = puntos[mitad].getX() - 1 - dminima;
+            double xminima = puntos[mitad].getX() - dminima;
             if (xminima < 0) {
                 xminima = 0;
             }
-            double xmaxima = puntos[mitad].getX() + 1 + dminima;
+            double xmaxima = puntos[mitad].getX() + dminima;
             while (b == false && i <= de) {
                 if (puntos[i].getX() >= xminima) {
                     b = true;
@@ -259,19 +261,26 @@ public class Ejercicio {
             }
             b = false;
             while (b == false && i <= de) {
-                int j = i + 1;
-                while (b == false && j <= de) {
-                    if (puntos[j].getX() <= xmaxima) {
-                        if (Punto.distancia(puntos[i], puntos[j]) < dminima) {
-                            solucion[0] = puntos[i];
-                            solucion[1] = puntos[j];
+                if (puntos[i].getX() <= xmaxima) {
+                    int j = i + 1;
+                    while (b == false && j <= de) {
+                        if (puntos[j].getX() <= xmaxima) {
+                            double distancia = Punto.distancia(puntos[i], puntos[j]);
+                            if (distancia < dminima) {
+                                dminima = distancia;
+                                solucion[0] = puntos[i];
+                                solucion[1] = puntos[j];
+                            }
+                            j++;
+                        } else {
+                            b = true;
                         }
-                        j++;
-                    } else {
-                        b = true;
                     }
+                    b = false;
+                    i++;
+                } else {
+                    b = true;
                 }
-                i++;
             }
         } else if (de - iz + 1 == 2) { //conjunto de 2 puntos
             solucion[0] = puntos[iz];
@@ -294,8 +303,77 @@ public class Ejercicio {
         return solucion;
     }
 
-    public Punto[] divideYvencerasMejora(Punto[] puntos) {
-        return null;
+    public Punto[] divideYvencerasMejora(Punto[] puntos, int iz, int de) {
+        Punto[] solucion = new Punto[2];
+        quicksortX(puntos);
+        if (de - iz + 1 > 3) { //conjunto de más de 2 puntos
+            int mitad = iz + ((de - iz + 1) / 2); //divide en 2 subconjuntos
+            Punto[] solucionIzq = divideYvenceras(puntos, iz, mitad - 1); //vuelve a resolver recursivamente hasta que quedan conjuntos de 2 ó 1 puntos
+            Punto[] solucionDer = divideYvenceras(puntos, mitad, de);
+            double dizq = Punto.distancia(solucionIzq[0], solucionIzq[1]);
+            double dder = Punto.distancia(solucionDer[0], solucionDer[1]);
+            double dminima; //cálculo de distancia mínima
+            if (dizq < dder) {
+                dminima = dizq;
+                solucion = solucionIzq;
+            } else {
+                dminima = dder;
+                solucion = solucionDer;
+            }
+            boolean b = false; //una vez tenemos la distancia mínima de la parte izquierda y la derecha, se comprueba si alguna distancia en la frontera es menor
+            int i = iz;
+            double xminima = puntos[mitad].getX() - dminima;
+            if (xminima < 0) {
+                xminima = 0;
+            }
+            double xmaxima = puntos[mitad].getX() + dminima;
+            while (b == false && i <= de) {
+                if (puntos[i].getX() >= xminima) {
+                    b = true;
+                } else {
+                    i++;
+                }
+            }
+            b = false;
+            int j = i;
+            while (b == false && j <= de) {
+                if (puntos[j].getX() <= xmaxima) {
+                    j++;
+                } else {
+                    b = true;
+                }
+            }
+            j--;
+            quicksortY(puntos, i, j);
+            for(int k = i; k < j; k++){
+                for(int y = k + 1; y < k + 12; y++){
+                    double distancia = Punto.distancia(puntos[k], puntos[y]);
+                    if(distancia < dminima){
+                        dminima = distancia;
+                        solucion[0] = puntos[k];
+                        solucion[1] = puntos[y];
+                    }
+                }
+            }
+        } else if (de - iz + 1 == 2) { //conjunto de 2 puntos
+            solucion[0] = puntos[iz];
+            solucion[1] = puntos[de];
+        } else if (de - iz + 1 == 3) { //conjunto de 3 puntos
+            double dist1 = Punto.distancia(puntos[iz], puntos[iz + 1]);
+            double dist2 = Punto.distancia(puntos[iz + 1], puntos[de]);
+            double dist3 = Punto.distancia(puntos[iz], puntos[de]);
+            if (dist1 < dist2 && dist1 < dist3) {
+                solucion[0] = puntos[iz];
+                solucion[1] = puntos[iz + 1];
+            } else if (dist2 < dist3) {
+                solucion[0] = puntos[iz + 1];
+                solucion[1] = puntos[de];
+            } else {
+                solucion[0] = puntos[iz];
+                solucion[1] = puntos[de];
+            }
+        }
+        return solucion;
     }
 
     public Ciudad ciudadMasCercanaSinVisitar(Ciudad inicio, Ciudad[] ciudades, boolean visitar) throws Exception {
@@ -313,7 +391,7 @@ public class Ejercicio {
             }
         }
         if (indice != -1) {
-            if(visitar == true){
+            if (visitar == true) {
                 ciudades[indice].setVisitado(true);
             }
             return ciudades[indice];
@@ -359,8 +437,8 @@ public class Ejercicio {
                 iz = diz;
                 boolean f = false;
                 int j = 0;
-                while(f == false && j < ciudades.length){
-                    if(ciudades[j].getCoordenadas().getId() == diz.getCoordenadas().getId()){
+                while (f == false && j < ciudades.length) {
+                    if (ciudades[j].getCoordenadas().getId() == diz.getCoordenadas().getId()) {
                         ciudades[j].setVisitado(true);
                         f = true;
                     }
@@ -371,8 +449,8 @@ public class Ejercicio {
                 de = dde;
                 boolean f = false;
                 int j = 0;
-                while(f == false && j < ciudades.length){
-                    if(ciudades[j].getCoordenadas().getId() == dde.getCoordenadas().getId()){
+                while (f == false && j < ciudades.length) {
+                    if (ciudades[j].getCoordenadas().getId() == dde.getCoordenadas().getId()) {
                         ciudades[j].setVisitado(true);
                         f = true;
                     }
@@ -529,7 +607,7 @@ public class Ejercicio {
                         break;
                     }
                     case 4: {
-                        Punto[] solucion = divideYvencerasMejora(puntos);
+                        Punto[] solucion = divideYvencerasMejora(puntos, 0, puntos.length - 1);
                         System.out.println("");
                         System.out.println(solucion[0].getPunto());
                         System.out.println(solucion[1].getPunto());
@@ -588,7 +666,7 @@ public class Ejercicio {
                             break;
                         }
                         case 4: {
-                            Punto[] solucion = divideYvencerasMejora(puntos);
+                            Punto[] solucion = divideYvencerasMejora(puntos, 0, puntos.length - 1);
                             System.out.println("");
                             System.out.println(solucion[0].getPunto());
                             System.out.println(solucion[1].getPunto());
@@ -780,7 +858,7 @@ public class Ejercicio {
                 tdyv = System.currentTimeMillis() - tdyv;
                 totaldyv = totaldyv + tdyv;
                 long tdyvmej = System.currentTimeMillis();
-                divideYvencerasMejora(puntos);
+                divideYvencerasMejora(puntos, 0, puntos.length - 1);
                 tdyvmej = System.currentTimeMillis() - tdyvmej;
                 totaldyvmej = totaldyvmej + tdyvmej;
             }
@@ -822,7 +900,7 @@ public class Ejercicio {
                 tdyv = System.currentTimeMillis() - tdyv;
                 totaldyv = totaldyv + tdyv;
                 long tdyvmej = System.currentTimeMillis();
-                divideYvencerasMejora(puntos);
+                divideYvencerasMejora(puntos, 0, puntos.length - 1);
                 tdyvmej = System.currentTimeMillis() - tdyvmej;
                 totaldyvmej = totaldyvmej + tdyvmej;
             }
