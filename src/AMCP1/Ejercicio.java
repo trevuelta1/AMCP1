@@ -230,7 +230,6 @@ public class Ejercicio {
 
     public Punto[] divideYvenceras(Punto[] puntos, int iz, int de) {
         Punto[] solucion = new Punto[2];
-        quicksortX(puntos);
         if (de - iz + 1 > 3) { //conjunto de más de 2 puntos
             int mitad = iz + ((de - iz + 1) / 2); //divide en 2 subconjuntos
             Punto[] solucionIzq = divideYvenceras(puntos, iz, mitad - 1); //vuelve a resolver recursivamente hasta que quedan conjuntos de 2 ó 1 puntos
@@ -253,15 +252,7 @@ public class Ejercicio {
             }
             double xmaxima = puntos[mitad].getX() + dminima;
             while (b == false && i <= de) {
-                if (puntos[i].getX() >= xminima) {
-                    b = true;
-                } else {
-                    i++;
-                }
-            }
-            b = false;
-            while (b == false && i <= de) {
-                if (puntos[i].getX() <= xmaxima) {
+                if (puntos[i].getX() <= xmaxima && puntos[i].getX() >= xminima) {
                     int j = i + 1;
                     while (b == false && j <= de) {
                         if (puntos[j].getX() <= xmaxima) {
@@ -278,7 +269,9 @@ public class Ejercicio {
                     }
                     b = false;
                     i++;
-                } else {
+                } else if(puntos[i].getX() < xminima){
+                    i++;
+                } else{
                     b = true;
                 }
             }
@@ -345,8 +338,8 @@ public class Ejercicio {
             }
             j--;
             quicksortY(puntos, i, j);
-            for(int k = i; k < j; k++){
-                for(int y = k + 1; y < k + 12; y++){
+            for(int k = i; k < j && k < puntos.length; k++){
+                for(int y = k + 1; y < k + 12 && y < puntos.length; y++){
                     double distancia = Punto.distancia(puntos[k], puntos[y]);
                     if(distancia < dminima){
                         dminima = distancia;
@@ -421,11 +414,11 @@ public class Ejercicio {
     public SolucionCiudades vorazDoble(Ciudad[] ciudades, Ciudad inicio) throws Exception {
         SolucionCiudades solucion = new SolucionCiudades(ciudades);
         solucion.addCiudad(inicio);
-        Ciudad[] camino = new Ciudad[ciudades.length * 2]; //tabla doble de ciudades
+        Ciudad[] camino = new Ciudad[ciudades.length * 2 + 2]; //tabla doble de ciudades
         int indizq = ciudades.length; //índice izquierdo
         int indder = ciudades.length + 1; //índice derecho
         Ciudad iz = inicio; //extremo izquierdo en la tabla doble de ciudades
-        Ciudad de = ciudadMasCercanaSinVisitar(inicio, ciudades, false); //extremo derecho en la tabla doble de ciudades
+        Ciudad de = ciudadMasCercanaSinVisitar(inicio, ciudades, true); //extremo derecho en la tabla doble de ciudades
         camino[indizq] = iz;
         camino[indder] = de;
         for (int i = 0; i < ciudades.length - 2; i++) {
@@ -441,7 +434,7 @@ public class Ejercicio {
                     if (ciudades[j].getCoordenadas().getId() == diz.getCoordenadas().getId()) {
                         ciudades[j].setVisitado(true);
                         f = true;
-                    }
+                    } else{j++;}
                 }
             } else {
                 indder++;
@@ -453,15 +446,17 @@ public class Ejercicio {
                     if (ciudades[j].getCoordenadas().getId() == dde.getCoordenadas().getId()) {
                         ciudades[j].setVisitado(true);
                         f = true;
-                    }
+                    } else{j++;}
                 }
             }
         }
         boolean b = false; //a partir de aquí se prepara la solución
         int i = ciudades.length + 1;
+        int cantidad = 1;
         while (b == false) {
             solucion.addCiudad(camino[i]);
             solucion.addDistancia(Punto.distancia(camino[i].getCoordenadas(), camino[i - 1].getCoordenadas()));
+            cantidad++;
             if (camino[i + 1] == null) {
                 b = true;
             } else {
@@ -474,7 +469,9 @@ public class Ejercicio {
         }
         for (int j = i; j < ciudades.length; j++) {
             solucion.addCiudad(camino[j]);
-            solucion.addDistancia(Punto.distancia(solucion.getCiudades()[solucion.getCiudades().length - 1].getCoordenadas(), solucion.getCiudades()[solucion.getCiudades().length - 2].getCoordenadas()));
+            double distancia = Punto.distancia(solucion.getCiudades()[cantidad].getCoordenadas(), solucion.getCiudades()[cantidad - 1].getCoordenadas());
+            solucion.addDistancia(distancia);
+            cantidad++;
         }
         solucion.addCiudad(solucion.getCiudades()[0]);
         solucion.addDistancia(Punto.distancia(solucion.getCiudades()[0].getCoordenadas(), solucion.getCiudades()[ciudades.length - 1].getCoordenadas()));
@@ -598,6 +595,7 @@ public class Ejercicio {
                         break;
                     }
                     case 3: {
+                        quicksortX(puntos);
                         Punto[] solucion = divideYvenceras(puntos, 0, puntos.length - 1);
                         System.out.println("");
                         System.out.println(solucion[0].getPunto());
@@ -657,6 +655,7 @@ public class Ejercicio {
                             break;
                         }
                         case 3: {
+                            quicksortX(puntos);
                             Punto[] solucion = divideYvenceras(puntos, 0, puntos.length - 1);
                             System.out.println("");
                             System.out.println(solucion[0].getPunto());
@@ -854,6 +853,7 @@ public class Ejercicio {
                 tpod = System.currentTimeMillis() - tpod;
                 totalpod = totalpod + tpod;
                 long tdyv = System.currentTimeMillis();
+                quicksortX(puntos);
                 divideYvenceras(puntos, 0, puntos.length - 1);
                 tdyv = System.currentTimeMillis() - tdyv;
                 totaldyv = totaldyv + tdyv;
@@ -862,7 +862,7 @@ public class Ejercicio {
                 tdyvmej = System.currentTimeMillis() - tdyvmej;
                 totaldyvmej = totaldyvmej + tdyvmej;
             }
-            System.out.println("\t" + size + "\t" + totalexh / 10 + "\t" + totalpod / 10 + "\t" + totaldyv / 10 + "\t" + totaldyvmej / 10);
+            System.out.println("\t" + size + "\t" + totalexh / 10 + "\t\t" + totalpod / 10 + "\t\t" + totaldyv / 10 + "\t\t" + totaldyvmej / 10);
             size = size + 500;
             totalexh = 0;
             totalpod = 0;
@@ -896,6 +896,7 @@ public class Ejercicio {
                 tpod = System.currentTimeMillis() - tpod;
                 totalpod = totalpod + tpod;
                 long tdyv = System.currentTimeMillis();
+                quicksortX(puntos);
                 divideYvenceras(puntos, 0, puntos.length - 1);
                 tdyv = System.currentTimeMillis() - tdyv;
                 totaldyv = totaldyv + tdyv;
