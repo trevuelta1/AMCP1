@@ -3,6 +3,7 @@ package AMCP1;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -16,6 +17,9 @@ import java.util.logging.Logger;
  */
 public class Ejercicio {
 
+    public static int pt = 0;
+    public static int ct = 0;
+    
     public Punto[] leeFichero() throws FileNotFoundException, IOException, Exception {
         ArrayList<Punto> puntos = new ArrayList();
         FileReader fr;
@@ -58,8 +62,55 @@ public class Ejercicio {
             throw new Exception("El fichero no tiene puntos suficientes.");
         }
     }
+    
+    public void escribeFicheroTSP(Punto[] puntos){
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter("files\\puntostest" + pt + ".tsp");
+            fw.write("NAME: puntostest" + pt + "\n");
+            fw.write("TYPE: TSP\n");
+            fw.write("COMMENT: Example file with random points\n");
+            fw.write("DIMENSION: " + puntos.length + "\n");
+            fw.write("EDGE_WEIGHT_TYPE: EUC_2D\n");
+            fw.write("NODE_COORD_SECTION\n");
+            for(int i = 0; i < puntos.length; i++){
+                fw.write(puntos[i].getId() + " " + puntos[i].getX() + " " + puntos[i].getY() + "\n");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fw.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    public void escribeFicheroTOUR(SolucionCiudades sol){
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter("files\\soluCiudades" + ct + ".opt.tour");
+            fw.write("NAME: soluCiudades" + ct + ".opt\n");
+            fw.write("TYPE: TOUR\n");
+            fw.write("DIMENSION: " + sol.getDistancias().length + "\n");
+            fw.write("SOLUTION: " + sol.getDistanciaTotal() + "\n");
+            fw.write("TOUR_SECTION\n");
+            for(int i = 0; i < sol.getDistancias().length; i++){
+                fw.write(sol.getDistancias()[i] + " - " + sol.getCiudades()[i].getCoordenadas().getId() + ", " + sol.getCiudades()[i + 1].getCoordenadas().getId() + "\n");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fw.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
-    private int particion(Punto vector[], int izquierda, int derecha) {
+    private int particionX(Punto vector[], int izquierda, int derecha) {
         double pivote = vector[izquierda].getX();
         // Ciclo infinito
         while (true) {
@@ -81,16 +132,50 @@ public class Ejercicio {
         }
     }
 
-    private void quicksort(Punto vector[], int izquierda, int derecha) {
+    private void quicksortX(Punto vector[], int izquierda, int derecha) {
         if (izquierda < derecha) {
-            int indiceParticion = particion(vector, izquierda, derecha);
-            quicksort(vector, izquierda, indiceParticion);
-            quicksort(vector, indiceParticion + 1, derecha);
+            int indiceParticion = particionX(vector, izquierda, derecha);
+            quicksortX(vector, izquierda, indiceParticion);
+            quicksortX(vector, indiceParticion + 1, derecha);
         }
     }
 
-    public void quicksort(Punto vector[]) {
-        quicksort(vector, 0, vector.length - 1);
+    public void quicksortX(Punto vector[]) {
+        quicksortX(vector, 0, vector.length - 1);
+    }
+    
+    private int particionY(Punto vector[], int izquierda, int derecha) {
+        double pivote = vector[izquierda].getY();
+        // Ciclo infinito
+        while (true) {
+            while (vector[izquierda].getY() < pivote) {
+                izquierda++;
+            }
+            while (vector[derecha].getY() > pivote) {
+                derecha--;
+            }
+            if (izquierda >= derecha) {
+                return derecha;
+            } else {
+                Punto temporal = vector[izquierda];
+                vector[izquierda] = vector[derecha];
+                vector[derecha] = temporal;
+                izquierda++;
+                derecha--;
+            }
+        }
+    }
+
+    private void quicksortY(Punto vector[], int izquierda, int derecha) {
+        if (izquierda < derecha) {
+            int indiceParticion = particionY(vector, izquierda, derecha);
+            quicksortY(vector, izquierda, indiceParticion);
+            quicksortY(vector, indiceParticion + 1, derecha);
+        }
+    }
+
+    public void quicksortY(Punto vector[]) {
+        quicksortY(vector, 0, vector.length - 1);
     }
 
     public Punto[] busquedaExhaustiva(Punto[] puntos) {
@@ -112,7 +197,7 @@ public class Ejercicio {
 
     public Punto[] busquedaPoda(Punto[] puntos) {
         Punto[] solucion = new Punto[2];
-        quicksort(puntos);
+        quicksortX(puntos);
         solucion[0] = puntos[0];
         solucion[1] = puntos[1];
         double dminima = Punto.distancia(puntos[0], puntos[1]);
@@ -143,7 +228,7 @@ public class Ejercicio {
 
     public Punto[] divideYvenceras(Punto[] puntos, int iz, int de) {
         Punto[] solucion = new Punto[2];
-        quicksort(puntos);
+        quicksortX(puntos);
         if (de - iz + 1 > 3) { //conjunto de más de 2 puntos
             int mitad = iz + ((de - iz + 1) / 2); //divide en 2 subconjuntos
             Punto[] solucionIzq = divideYvenceras(puntos, iz, mitad - 1); //vuelve a resolver recursivamente hasta que quedan conjuntos de 2 ó 1 puntos
@@ -213,7 +298,7 @@ public class Ejercicio {
         return null;
     }
 
-    public Ciudad ciudadMasCercanaSinVisitar(Ciudad inicio, Ciudad[] ciudades) throws Exception {
+    public Ciudad ciudadMasCercanaSinVisitar(Ciudad inicio, Ciudad[] ciudades, boolean visitar) throws Exception {
         double dmin = Double.MAX_VALUE;
         int indice = -1;
         for (int i = 0; i < ciudades.length; i++) {
@@ -228,7 +313,9 @@ public class Ejercicio {
             }
         }
         if (indice != -1) {
-            ciudades[indice].setVisitado(true);
+            if(visitar == true){
+                ciudades[indice].setVisitado(true);
+            }
             return ciudades[indice];
         } else {
             throw new Exception("Todas las ciudades han sido visitadas.");
@@ -239,7 +326,7 @@ public class Ejercicio {
         SolucionCiudades solucion = new SolucionCiudades(ciudades);
         solucion.addCiudad(inicio);
         for (int i = 0; i < ciudades.length - 1; i++) {
-            Ciudad c = ciudadMasCercanaSinVisitar(inicio, ciudades);
+            Ciudad c = ciudadMasCercanaSinVisitar(inicio, ciudades, true);
             solucion.addCiudad(c);
             solucion.addDistancia(Punto.distancia(inicio.getCoordenadas(), c.getCoordenadas()));
             inicio = c;
@@ -260,26 +347,36 @@ public class Ejercicio {
         int indizq = ciudades.length; //índice izquierdo
         int indder = ciudades.length + 1; //índice derecho
         Ciudad iz = inicio; //extremo izquierdo en la tabla doble de ciudades
-        Ciudad de = ciudadMasCercanaSinVisitar(inicio, ciudades); //extremo derecho en la tabla doble de ciudades
+        Ciudad de = ciudadMasCercanaSinVisitar(inicio, ciudades, false); //extremo derecho en la tabla doble de ciudades
         camino[indizq] = iz;
         camino[indder] = de;
         for (int i = 0; i < ciudades.length - 2; i++) {
-            Ciudad[] izq = new Ciudad[ciudades.length];
-            Ciudad[] der = new Ciudad[ciudades.length];
-            izq = ciudades.clone(); //se crean dos copias de ciudades, para que el algoritmo ciudadMasCercanaSinVisitar no marque como visitada ninguna ciudad directamente en la tabla ciudades.
-            der = ciudades.clone();
-            Ciudad diz = ciudadMasCercanaSinVisitar(iz, izq); //ciudad más cercana al extremo izquierdo
-            Ciudad dde = ciudadMasCercanaSinVisitar(de, der); //ciudad más cercana al extremo derecho
+            Ciudad diz = ciudadMasCercanaSinVisitar(iz, ciudades, false); //ciudad más cercana al extremo izquierdo
+            Ciudad dde = ciudadMasCercanaSinVisitar(de, ciudades, false); //ciudad más cercana al extremo derecho
             if (Punto.distancia(diz.getCoordenadas(), iz.getCoordenadas()) < Punto.distancia(dde.getCoordenadas(), de.getCoordenadas())) { //en función de cuál de las anteriores sea más cercana, se modifica camino y se reestablece ciudades con la copia correcta
                 indizq--;
                 camino[indizq] = diz;
                 iz = diz;
-                ciudades = izq.clone();
+                boolean f = false;
+                int j = 0;
+                while(f == false && j < ciudades.length){
+                    if(ciudades[j].getCoordenadas().getId() == diz.getCoordenadas().getId()){
+                        ciudades[j].setVisitado(true);
+                        f = true;
+                    }
+                }
             } else {
                 indder++;
                 camino[indder] = dde;
                 de = dde;
-                ciudades = der.clone();
+                boolean f = false;
+                int j = 0;
+                while(f == false && j < ciudades.length){
+                    if(ciudades[j].getCoordenadas().getId() == dde.getCoordenadas().getId()){
+                        ciudades[j].setVisitado(true);
+                        f = true;
+                    }
+                }
             }
         }
         boolean b = false; //a partir de aquí se prepara la solución
@@ -389,6 +486,8 @@ public class Ejercicio {
                 for (int i = 0; i < talla; i++) {
                     puntos[i] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                 }
+                escribeFicheroTSP(puntos);
+                pt++;
                 int opt;
                 do {
                     System.out.println("Indique la estrategia que desea probar: ");
@@ -546,6 +645,8 @@ public class Ejercicio {
                     puntos[i] = new Punto(x.nextDouble() * 1000, y.nextDouble() * 1000);
                     ciudades[i] = new Ciudad(puntos[i]);
                 }
+                escribeFicheroTSP(puntos);
+                pt++;
                 int opt;
                 do {
                     System.out.println("Indique la estrategia que desea probar: ");
@@ -562,6 +663,8 @@ public class Ejercicio {
                             ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
                             solucion.getSolucion();
+                            escribeFicheroTOUR(solucion);
+                            ct++;
                             break;
                         } catch (Exception ex) {
                             Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
@@ -573,6 +676,8 @@ public class Ejercicio {
                             ciudades[0].setVisitado(true);
                             SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
                             solucion.getSolucion();
+                            escribeFicheroTOUR(solucion);
+                            ct++;
                             break;
                         } catch (Exception ex) {
                             Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
@@ -608,6 +713,8 @@ public class Ejercicio {
                                 ciudades[0].setVisitado(true);
                                 SolucionCiudades solucion = vorazCiudades(ciudades, ciudades[0]);
                                 solucion.getSolucion();
+                                escribeFicheroTOUR(solucion);
+                                ct++;
                                 break;
                             } catch (Exception ex) {
                                 Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
@@ -619,6 +726,8 @@ public class Ejercicio {
                                 ciudades[0].setVisitado(true);
                                 SolucionCiudades solucion = vorazDoble(ciudades, ciudades[0]);
                                 solucion.getSolucion();
+                                escribeFicheroTOUR(solucion);
+                                ct++;
                                 break;
                             } catch (Exception ex) {
                                 Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
