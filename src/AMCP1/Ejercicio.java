@@ -871,6 +871,7 @@ public class Ejercicio {
             totaldyv = 0;
             totaldyvmej = 0;
         }
+        System.out.println("");
     }
 
     public void compararEstrategiasMismaVertical() {
@@ -914,6 +915,7 @@ public class Ejercicio {
             totaldyv = 0;
             totaldyvmej = 0;
         }
+        System.out.println("");
     }
 
     public void compararEstrategiasCiudades() {
