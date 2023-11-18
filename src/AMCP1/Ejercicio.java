@@ -19,6 +19,8 @@ public class Ejercicio {
 
     public static int pt = 0;
     public static int ct = 0;
+    public static int vuni = 0;
+    public static int vbi = 0;
 
     public Punto[] leeFichero() throws FileNotFoundException, IOException, Exception {
         ArrayList<Punto> puntos = new ArrayList();
@@ -862,7 +864,7 @@ public class Ejercicio {
                 tdyvmej = System.currentTimeMillis() - tdyvmej;
                 totaldyvmej = totaldyvmej + tdyvmej;
             }
-            System.out.println("\t" + size + "\t" + totalexh / 10 + "\t\t" + totalpod / 10 + "\t\t" + totaldyv / 10 + "\t\t" + totaldyvmej / 10);
+            System.out.println("\t" + size + "\t" + totalexh / 10 + "ms\t\t" + totalpod / 10 + "ms\t\t" + totaldyv / 10 + "ms\t\t" + totaldyvmej / 10 + "ms");
             size = size + 500;
             totalexh = 0;
             totalpod = 0;
@@ -905,7 +907,7 @@ public class Ejercicio {
                 tdyvmej = System.currentTimeMillis() - tdyvmej;
                 totaldyvmej = totaldyvmej + tdyvmej;
             }
-            System.out.println("\t" + size + "\t" + totalexh / 10 + "\t" + totalpod / 10 + "\t" + totaldyv / 10 + "\t" + totaldyvmej / 10);
+            System.out.println("\t" + size + "\t" + totalexh / 10 + "ms\t\t" + totalpod / 10 + "ms\t\t" + totaldyv / 10 + "ms\t\t" + totaldyvmej / 10 + "ms");
             size = size + 500;
             totalexh = 0;
             totalpod = 0;
@@ -938,23 +940,39 @@ public class Ejercicio {
                     }
                     ciudades[0].setVisitado(true);
                     long tuni = System.currentTimeMillis();
-                    vorazCiudades(ciudades, ciudades[0]);
+                    SolucionCiudades soluni = vorazCiudades(ciudades, ciudades[0]);
                     tuni = System.currentTimeMillis() - tuni;
                     totaluni = totaluni + tuni;
                     ciudades[0].setVisitado(true);
                     long tbi = System.currentTimeMillis();
-                    vorazDoble(ciudades, ciudades[0]);
+                    SolucionCiudades solbi = vorazDoble(ciudades, ciudades[0]);
                     tbi = System.currentTimeMillis() - tbi;
                     totalbi = totalbi + tbi;
+                    if(soluni.getDistanciaTotal() < solbi.getDistanciaTotal()){
+                        vuni++;
+                    } else if(solbi.getDistanciaTotal() < soluni.getDistanciaTotal()){
+                        vbi++;
+                    }
                 } catch (Exception ex) {
                     Logger.getLogger(Ejercicio.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            System.out.println("\t" + size + "\t" + totaluni / 100 + "\t" + totalbi / 100);
+            System.out.println("\t" + size + "\t" + totaluni / 100 + "ms\t\t\t" + totalbi / 100 + "ms");
             size = size + 500;
             totaluni = 0;
             totalbi = 0;
         }
+        System.out.println("");
+        System.out.println("------------------------------------------------------------------");
+        System.out.println("");
+        System.out.println("La mejor solución ha sido obtenida por:");
+        double puni = (((double)vuni / ((double)vuni + (double)vbi)) * 100);
+        double pbi = (((double)vbi / ((double)vuni + (double)vbi)) * 100);
+        System.out.println("Voraz unidireccional: " + vuni + " veces (" + puni + "%).");
+        System.out.println("Voraz bidireccional: " + vbi + " veces (" + pbi + "%).");
+        System.out.println("");
+        vuni = 0;
+        vbi = 0;
     }
 
     public static void main(String[] args) {
